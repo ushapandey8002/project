@@ -1,0 +1,76 @@
+# To-Do List Application | Python | Usha Pandey
+
+def load_tasks(filename):
+    tasks = []
+    try:
+        with open(filename, "r") as f:
+            for line in f:
+                task, status = line.strip().rsplit("|", 1)
+                tasks.append([task, status == "done"])
+    except FileNotFoundError:
+        pass  # No file yet, start fresh
+    return tasks
+
+def save_tasks(tasks, filename):
+    with open(filename, "w") as f:
+        for task, done in tasks:
+            f.write(f"{task}|{'done' if done else 'pending'}\n")
+
+def show_tasks(tasks):
+    if not tasks:
+        print("No tasks.")
+    for i, (task, done) in enumerate(tasks, 1):
+        status = "[x]" if done else "[ ]"
+        print(f"{i}. {status} {task}")
+
+def add_task(tasks):
+    task = input("Enter new task: ").strip()
+    if task:
+        tasks.append([task, False])
+        print("Task added.")
+
+def delete_task(tasks):
+    show_tasks(tasks)
+    num = int(input("Enter number to delete: "))
+    if 1 <= num <= len(tasks):
+        removed = tasks.pop(num-1)
+        print(f"Deleted: {removed[0]}")
+    else:
+        print("Invalid number.")
+
+def mark_complete(tasks):
+    show_tasks(tasks)
+    num = int(input("Enter number to mark complete: "))
+    if 1 <= num <= len(tasks):
+        tasks[num-1][1] = True
+        print(f"Marked as complete: {tasks[num-1][0]}")
+
+filename = "tasks.txt"
+tasks = load_tasks(filename)
+
+while True:
+    print("\n-- To-Do List --")
+    print("1. Show tasks")
+    print("2. Add task")
+    print("3. Delete task")
+    print("4. Mark task as complete")
+    print("5. Exit")
+    choice = input("Choose: ").strip()
+
+    if choice == "1":
+        show_tasks(tasks)
+    elif choice == "2":
+        add_task(tasks)
+        save_tasks(tasks, filename)
+    elif choice == "3":
+        delete_task(tasks)
+        save_tasks(tasks, filename)
+    elif choice == "4":
+        mark_complete(tasks)
+        save_tasks(tasks, filename)
+    elif choice == "5":
+        save_tasks(tasks, filename)
+        print("Goodbye!")
+        break
+    else:
+        print("Invalid choice.")
