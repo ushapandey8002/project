@@ -1,24 +1,24 @@
-# To-Do List Application | Python | Usha Pandey
-
 def load_tasks(filename):
     tasks = []
     try:
         with open(filename, "r") as f:
             for line in f:
-                task, status = line.strip().rsplit("|", 1)
-                tasks.append([task, status == "done"])
+                if "|" in line:
+                    task, status = line.strip().rsplit("|", 1)
+                    tasks.append([task, status == "done"])
     except FileNotFoundError:
         pass  # No file yet, start fresh
-    return tasks
+    return tasks   # line 17
 
 def save_tasks(tasks, filename):
     with open(filename, "w") as f:
         for task, done in tasks:
-            f.write(f"{task}|{'done' if done else 'pending'}\n")
+            f.write(f"{task}|{'done' if done else 'pending'}")
 
 def show_tasks(tasks):
     if not tasks:
         print("No tasks.")
+        return
     for i, (task, done) in enumerate(tasks, 1):
         status = "[x]" if done else "[ ]"
         print(f"{i}. {status} {task}")
@@ -28,33 +28,53 @@ def add_task(tasks):
     if task:
         tasks.append([task, False])
         print("Task added.")
+    else:
+        print("Task cannot be empty.")
 
 def delete_task(tasks):
     show_tasks(tasks)
-    num = int(input("Enter number to delete: "))
-    if 1 <= num <= len(tasks):
-        removed = tasks.pop(num-1)
-        print(f"Deleted: {removed[0]}")
-    else:
-        print("Invalid number.")
+    if not tasks:
+        return
+    try:
+        num = int(input("Enter number to delete: "))
+        if 1 <= num <= len(tasks):
+            removed = tasks.pop(num - 1)
+            print(f"Deleted: {removed[0]}")
+        else:
+            print("Invalid task number.")
+    except ValueError:
+        print("Please enter a valid number.")
 
 def mark_complete(tasks):
     show_tasks(tasks)
-    num = int(input("Enter number to mark complete: "))
-    if 1 <= num <= len(tasks):
-        tasks[num-1][1] = True
-        print(f"Marked as complete: {tasks[num-1][0]}")
+    if not tasks:
+        return
+    try:
+        num = int(input("Enter number to mark complete: "))
+        if 1 <= num <= len(tasks):
+            if tasks[num - 1][1]:
+                print("Task is already marked as complete.")
+            else:
+                tasks[num - 1][1] = True
+                print(f"Marked as complete: {tasks[num - 1][0]}")
+        else:
+            print("Invalid task number.")
+    except ValueError:
+        print("Please enter a valid number")
+
+# ---------------- Main Program ----------------
 
 filename = "tasks.txt"
 tasks = load_tasks(filename)
 
 while True:
-    print("\n-- To-Do List --")
+    print("-- To-Do List --")
     print("1. Show tasks")
     print("2. Add task")
     print("3. Delete task")
     print("4. Mark task as complete")
     print("5. Exit")
+
     choice = input("Choose: ").strip()
 
     if choice == "1":
@@ -73,4 +93,4 @@ while True:
         print("Goodbye!")
         break
     else:
-        print("Invalid choice.")
+        print("Invalid choice. Please enter a number between 1 and 5.")
